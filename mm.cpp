@@ -12,6 +12,16 @@ constexpr int n=8;
 constexpr int k=4;
 
 int main() {
+
+    // This is a customized lambda NVIDIA GPU device selector from Codeplay. 
+    auto CUDASelector = [](sycl::device const &dev) {
+        if (dev.get_platform().get_backend() == sycl::backend::ext_oneapi_cuda) {
+            std::cout << " CUDA device found " << std::endl;
+            return 1;
+        } else {
+            return -1;
+        }
+    };
     
     auto R_A = range<1>(m*k);
     auto R_B = range<1>(k*n);
@@ -20,7 +30,7 @@ int main() {
     std::vector<int> v_B(k*n,2);
     std::vector<int> v_out(m*n,0);
     
-    queue Q(cpu_selector{});
+    queue Q(cpu_selector{});  // This requires a customized NVIDIA device selector, refer to the Codeplay Tutorial.
     
     {
         // Initialize Buffer

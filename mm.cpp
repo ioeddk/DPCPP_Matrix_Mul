@@ -30,7 +30,7 @@ int main() {
     std::vector<int> v_B(k*n,2);
     std::vector<int> v_out(m*n,0);
     
-    sycl::queue myQueue{CUDASelector};
+    sycl::queue Q{CUDASelector};
     
     {
         // Initialize Buffer

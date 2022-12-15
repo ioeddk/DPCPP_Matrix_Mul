@@ -30,7 +30,7 @@ int main() {
     std::vector<int> v_B(k*n,2);
     std::vector<int> v_out(m*n,0);
     
-    queue Q(cpu_selector{});  // This requires a customized NVIDIA device selector, refer to the Codeplay Tutorial.
+    sycl::queue myQueue{CUDASelector};
     
     {
         // Initialize Buffer

@@ -1,5 +1,7 @@
 #  docker build -t name .
 
+# FIXME: Want to change the installation path of the llvm folder to another place
+
 FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -15,4 +17,4 @@ RUN rm /home/*.sh /home/*.deb
 
 RUN echo "export PATH=/home/llvm/build/bin:$PATH" >> /root/.bashrc
 RUN echo "export LD_LIBRARY_PATH=/home/llvm/build/lib:$LD_LIBRARY_PATH" >> /root/.bashrc
-# ADD nvcc bin to path!!!
+# FIXME: add nvcc bin to path!!!

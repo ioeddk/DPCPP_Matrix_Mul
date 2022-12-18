@@ -81,7 +81,7 @@ int main() {
         
 
         // Should I use accessor to access the result matrix or the original vector itself. 
-        auto result = out_buf.get_access<access::mode::read>(); // synchrounize the outputs. 
+        auto result = C_buf.get_access<access::mode::read>(); // synchrounize the outputs. 
         for (int i=0; i<n; i++){
             for (int j = 0; j < n; j++){
                 std::cout << result[i*n+j] << " ";

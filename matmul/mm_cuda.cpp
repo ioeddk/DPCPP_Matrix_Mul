@@ -1,4 +1,5 @@
 #include <CL/sycl.hpp>
+#include <sycl/backend/cuda.hpp>
 #include <iostream>
 #include "mmpy_kernel.cu"
 
@@ -18,7 +19,7 @@ using namespace cl::sycl;
 
 #define TILEDIM_K 64
 
-constexpr int n=8;
+constexpr int n=128;
 
 // CUDA device selector
 class CUDASelector : public sycl::device_selector {
@@ -38,9 +39,9 @@ int main() {
     auto R_A = range<1>(n*n);
     auto R_B = range<1>(n*n);
     auto R_C = range<1>(n*n);
-    std::vector<int> v_A(n*n,1);
-    std::vector<int> v_B(n*n,1);
-    std::vector<int> v_C(m*n,0);
+    std::vector<double> v_A(n*n,1.0);
+    std::vector<double> v_B(n*n,1.0);
+    std::vector<double> v_C(m*n,0.0);
     
     device dev{CUDASelector().select_device()};
     context myContext{dev};
@@ -49,9 +50,9 @@ int main() {
     
     {
         // Initialize Buffer
-        buffer<int, 1> A_buf(v_A.data(), R_A);
-        buffer<int, 1> B_buf(v_B.data(), R_B);
-        buffer<int, 1> C_buf(v_C.data(), R_C);
+        buffer<double, 1> A_buf(v_A.data(), R_A);
+        buffer<double, 1> B_buf(v_B.data(), R_B);
+        buffer<double, 1> C_buf(v_C.data(), R_C);
 
         Q.submit([&](handler& h) {
                 // stream out_prt(1024, 256, h);  // What are those two parameters are used for? 
@@ -69,21 +70,21 @@ int main() {
                     dim3 grideSize{ (n % TILEDIM_N) == 0 ? (n / TILEDIM_N) : (n / TILEDIM_N + 1), (n % TILEDIM_M) == 0 ? (n / TILEDIM_M) : (n / TILEDIM_M + 1), 1};
                     dim3 blockSize{TILEDIM_N/TILESCALE_N, TILEDIM_M/TILESCALE_M, 1};
 
-                    vecAdd<<<gridSize, blockSize, 64 * 1024>>>(n, C, A, B);  // but here how to define multidimensional array? 
+                    matMul<<<gridSize, blockSize, 64 * 1024>>>(n, C, A, B);  // but here how to define multidimensional array? 
                     // Interop with host_task doesn't add CUDA event to task graph
                     // so we must manually sync here.
                     cudaDeviceSynchronize();
                     // out_prt << idx << endl;
                 }); 
-                auto result = C_buf.get_access<access::mode::read>(h); // synchrounize the outputs. 
+                // auto result = C_buf.get_access<access::mode::read>(h); // synchrounize the outputs. 
         });
         
 
         // Should I use accessor to access the result matrix or the original vector itself. 
         auto result = out_buf.get_access<access::mode::read>(); // synchrounize the outputs. 
-        for (int i=0; i<m; i++){
+        for (int i=0; i<n; i++){
             for (int j = 0; j < n; j++){
-                std::cout << result[i*k+j] << " ";
+                std::cout << result[i*n+j] << " ";
             }
             std::cout << "\n";
         }

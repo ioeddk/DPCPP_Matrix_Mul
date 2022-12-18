@@ -41,7 +41,7 @@ int main() {
     auto R_C = range<1>(n*n);
     std::vector<double> v_A(n*n,1.0);
     std::vector<double> v_B(n*n,1.0);
-    std::vector<double> v_C(m*n,0.0);
+    std::vector<double> v_C(n*n,0.0);
     
     device dev{CUDASelector().select_device()};
     context myContext{dev};
@@ -67,7 +67,7 @@ int main() {
                     auto B = reinterpret_cast<double*>(ih.get_native_mem<backend::ext_oneapi_cuda>(accB));
                     auto C = reinterpret_cast<double*>(ih.get_native_mem<backend::ext_oneapi_cuda>(accC));
                     
-                    dim3 grideSize{ (n % TILEDIM_N) == 0 ? (n / TILEDIM_N) : (n / TILEDIM_N + 1), (n % TILEDIM_M) == 0 ? (n / TILEDIM_M) : (n / TILEDIM_M + 1), 1};
+                    dim3 gridSize{ (n % TILEDIM_N) == 0 ? (n / TILEDIM_N) : (n / TILEDIM_N + 1), (n % TILEDIM_M) == 0 ? (n / TILEDIM_M) : (n / TILEDIM_M + 1), 1};
                     dim3 blockSize{TILEDIM_N/TILESCALE_N, TILEDIM_M/TILESCALE_M, 1};
 
                     matMul<<<gridSize, blockSize, 64 * 1024>>>(n, C, A, B);  // but here how to define multidimensional array? 

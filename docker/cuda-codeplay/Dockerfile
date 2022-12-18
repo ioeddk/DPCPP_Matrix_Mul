@@ -16,5 +16,5 @@ RUN /home/dpcpp-codeplay.sh
 RUN rm /home/*.sh /home/*.deb
 
 RUN echo "export PATH=/home/llvm/build/bin:$PATH" >> /root/.bashrc
+RUN echo "export PATH=/usr/local/cuda/bin:$PATH" >> /root/.bashrc
 RUN echo "export LD_LIBRARY_PATH=/home/llvm/build/lib:$LD_LIBRARY_PATH" >> /root/.bashrc
-# FIXME: add nvcc bin to path!!!

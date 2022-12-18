@@ -49,7 +49,7 @@ __global__ void matMul(int N, double *C, double *A, double *B) {
 
     double  * As = &sharedmem[0];
     double  * Bs = &As[TILEDIM_M * TILEDIM_K];  // This is the shared memory used to index the 
-    register double _c[TILESCALE_M][TILESCALE_N] = {0}; // TILESCALE_M = N/TILEDIM_M memory accesses
+    double _c[TILESCALE_M][TILESCALE_N] = {0}; // TILESCALE_M = N/TILEDIM_M memory accesses
 
     #pragma unroll
     for (int kk = 0; kk < N; kk += TILEDIM_K) {  // Itereate through K dimension. 
